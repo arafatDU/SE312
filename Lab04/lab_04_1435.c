@@ -2,42 +2,44 @@
 #include<stdbool.h>
 #include<string.h>
 
-bool result = false;
-int length, cnt=0;
-char input[100], store[100], looped;
 
-
-void stateTransition(int num_states, int num_symbol, char *set_of_states, char *alphabet, char initial_state, char final_state, char transition[num_states][num_symbol][10], int num_transition[num_states][num_symbol], int index)
+void NFA_to_DFA(int num_states,int num_symbol, char *set_of_state,char *alphabet, char initial_state,char final_states,char transition_table[num_states][num_symbol][10],char dfa_transition[num_states][num_symbol+1][10])
 {
-    if(index == length && initial_state == final_state){
-        result = true;
-        store[cnt++] = initial_state;
-        for(int i=0; i<cnt; i++) printf("%c ", store[i]);
-        printf("\n");
-        return;
-    }
-    if(index == length && initial_state != final_state){
-        cnt--;
-        looped = initial_state;
-        return;
-    }
-    int i;
-    for(i = 0; i<num_symbol; i++) {
-        if(alphabet[i] == input[index]) break;
-    }
-    if(num_transition[initial_state - 'a'][i] == 0) return;
+    dfa_transition[0][0][0] = initial_state;
+    for(int i=0; i<num_symbol; i++)
+        for(int k=0; transition_table[0][i][k] != '#'; k++)
+            dfa_transition[0][i+1][k] = transition_table[0][i][k];
+
+    // for(int i=0; i<num_states; i++)
+    // {
+    //     for(int j=0; j<num_symbol+1; j++)
+    //     {
+    //         for(int k=0; k<10; k++)
+    //         {
+    //             if(k == strlen(transition_table[i][j])) break;
+    //             if(i==0 && j==0 && k==0)
+    //                 dfa_transition[i][j][k] = initial_state;
+                
+    //             dfa_transition[i][j+1][k]= transition_table[i][j][k];
+    //             
+    //         }
+    //     }
+    // }
     
-    int k = 0;
-    store[cnt++] = initial_state;
-    while(k < num_transition[initial_state - 'a'][i] && !result){
-        stateTransition(num_states, num_symbol, set_of_states, alphabet, transition[initial_state-'a'][i][k], final_state, transition, num_transition, index+1);
-        k++;
+
+}
+
+
+int is_match(char *arr1, char *arr2)
+{
+    int len1 = strlen(arr1);
+    int len2 = strlen(arr2);
+    if(len1 != len2) return 0;
+    for(int i=0; i<len1; i++)
+    {
+        if(arr1[i] != arr2[i]) return 0;
     }
-
-    return;
-
-
-
+    return 1;
 }
 
 int main()
@@ -50,6 +52,7 @@ int main()
     getchar();
 
     char set_of_state[num_states],alphabet[num_symbol],initial_state,final_states,transition_table[num_states][num_symbol][10],steps[100];
+    char dfa_transition[num_states][num_symbol+1][10];
     for(int i=0; i<num_states; i++){
         printf("Enter state %d: ",i+1);
         scanf("%c",&set_of_state[i]);
@@ -78,7 +81,13 @@ int main()
             }
         }
     }
-
+    for(int i=0; i<num_states; i++){
+        for(int j=0; j<num_symbol+1; j++){
+            for(int k=0; k<10; k++){
+                dfa_transition[i][j][k] = '*';
+            }
+        }
+    }
 
     int num_transition[num_states][num_symbol];
     for(int i=0; i<num_states; i++){
@@ -95,7 +104,9 @@ int main()
         }
     }
 
+
     // checking transition table
+    printf("DFA Transition Table: \n");
     for(int i=0; i<num_states; i++){
         printf("%d  ", i);
         for(int j=0; j<num_symbol; j++){
@@ -106,21 +117,22 @@ int main()
         }
         printf("\n");
     }
-    // checking num_transition matrix
+
+
+
+    NFA_to_DFA(num_states, num_symbol, set_of_state, alphabet, initial_state, final_states, transition_table, dfa_transition);
+
+
+    // checking dfa transition table
     for(int i=0; i<num_states; i++){
-        printf("%d  ", i);
-        for(int j=0; j<num_symbol; j++){
-            printf("%d ", num_transition[i][j]);
+        for(int j=0; j<num_symbol+1; j++){
+            for(int k=0; k<10; k++){
+                printf("%c ", dfa_transition[i][j][k]);
+            }
+            printf(" ");
         }
         printf("\n");
     }
-
-    printf("Enter the string: ");
-    scanf("%s", input);
-    length = strlen(input);
-    stateTransition(num_states, num_symbol, set_of_state, alphabet, initial_state, final_states, transition_table, num_transition, 0);
-    if(result) printf("Accepted\n");
-    else printf("Rejected because looping in %c\n", looped);
 
 
     return 0;
