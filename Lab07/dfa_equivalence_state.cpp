@@ -21,29 +21,70 @@ void readInput()
 }
 
 
-
-bool isEquivalence(string s1, string s2)
+int getIndex(string s)
 {
-    int index1, index2;
-    if(s1 == finalstate || s2 == finalstate) return false;
+    int i;
+    for(i=0; i<STATES; i++)
+        if(dfa_transition[i][0] == s) break;
+    return i;
+}
 
-    for(int i=0; i<STATES; i++)
-        if(dfa_transition[i][0] == s1) index1 = i;
 
-    for(int j=0; j<STATES; j++)
-        if(dfa_transition[j][0] == s2) index2 = j;
-
-    //cout<<endl<<"For index "<<index1<<" and "<<index2<<endl;
-
+bool canBeEquivalence(int index1, int index2)
+{
     if(dfa_transition[index1][1] == finalstate && dfa_transition[index2][1] != finalstate) return false;
     else if(dfa_transition[index1][1] != finalstate && dfa_transition[index2][1] == finalstate) return false;
     
     else if(dfa_transition[index1][2] == finalstate && dfa_transition[index2][2] != finalstate) return false;
     else if(dfa_transition[index1][2] != finalstate && dfa_transition[index2][2] == finalstate) return false;
 
-    else{
-        
+    return true;
+}
+
+
+bool isEquivalence(string s1, string s2)
+{
+    //cout<<"("<<s1<< " "<< s2<<") "<<endl;
+    int index1, index2;
+    if(s1 == finalstate || s2 == finalstate) return false;
+
+    index1 = getIndex(s1);
+    index2 = getIndex(s2);
+    //cout<<"For index "<<index1<<" and "<<index2<<endl;
+
+    if(!canBeEquivalence(index1, index2)){
+        // states cannot be equivalence---proved
+        return false;
     }
+    else{
+        cout<<endl<<"("<<s1<< " "<< s2<<") is in else conditions for check 00/01 and 10/11"<<endl;
+        
+        // First check 10/11 ----> (s1_1)---0--- and (s2_1)----1---
+        string stateFromS1By1 = dfa_transition[index1][2];
+        string stateFromS2By1 = dfa_transition[index2][2];
+
+        // Second check 00/01 ----> (s1_0)---0--- and (s2_0)----1---
+        string stateFromS1By0 = dfa_transition[index1][1];
+        string stateFromS2By0 = dfa_transition[index2][1];
+
+        index1 = getIndex(stateFromS1By1);
+        index2 = getIndex(stateFromS2By1);
+
+        if(!canBeEquivalence(index1, index2)){
+            // states cannot be equivalence---proved
+            return false;
+        }
+        else{
+            cout<<endl<<"---- Now check 00 or 01---"<<endl;
+
+            index1 = getIndex(stateFromS1By0);
+            index2 = getIndex(stateFromS2By0);
+
+            if(!canBeEquivalence(index1, index2)) return false;
+
+        }
+    }
+    
 
     return true;
 
@@ -80,7 +121,7 @@ int main()
 
 
     // Checking the equivalence state
-    // case 01: 
+    
     string s1, s2;
     for(int i=1; i<STATES; i++)
     {
@@ -88,7 +129,7 @@ int main()
         for(int j=0; j<i; j++)
         {
             s2 = dfa_transition[j][0];
-            cout<<"("<<s1<< " "<< s2<<") ";
+            //cout<<"("<<s1<< " "<< s2<<") ";
             if(isEquivalence(s1, s2)) TF[i][j] = "=";
         }
     }
