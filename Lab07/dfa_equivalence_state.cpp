@@ -7,6 +7,7 @@ using namespace std;
 string initialState, finalstate;
 string dfa_transition[STATES][SYMBOLS+1];
 string TF[STATES][STATES];
+string equivalence[STATES][2];
 
 void readInput()
 {
@@ -91,6 +92,19 @@ bool isEquivalence(string s1, string s2)
 }
 
 
+int indexOfMatchedRemovedState(string s)
+{
+    for(int i=0; i<STATES; i++)
+    {
+        if(s == equivalence[i][0])
+        {
+            return i;
+        }
+    }
+    return 0;
+}
+
+
 int main()
 {
     freopen("input.txt", "r", stdin);
@@ -130,7 +144,20 @@ int main()
         {
             s2 = dfa_transition[j][0];
             //cout<<"("<<s1<< " "<< s2<<") ";
-            if(isEquivalence(s1, s2)) TF[i][j] = "=";
+            if(isEquivalence(s1, s2)) 
+            {
+                TF[i][j] = "=";
+                if(s1 != initialState)
+                {
+                    equivalence[i][0] = s1;
+                    equivalence[i][1] = s2; 
+                }
+                else 
+                {
+                    equivalence[i][0] = s2;
+                    equivalence[i][1] = s1; 
+                }
+            }
         }
     }
 
@@ -149,6 +176,25 @@ int main()
     }
 
 
+    for(int i=0; i<STATES; i++)
+        for(int j=0; j<2; j++)
+            if(equivalence[i][j] != " ")
+                cout<<equivalence[i][j]<<" ";
+
+
+    // Print final transition table
+    cout<<endl<<endl;
+    for(int i=0; i<STATES; i++)
+    {
+        if(dfa_transition[i][0] == equivalence[i][0]) continue;
+        for(int j=0; j<SYMBOLS + 1; j++)
+        {
+            int index = indexOfMatchedRemovedState(dfa_transition[i][j]);
+            if(index) cout<<equivalence[index][1]<<" ";
+            else cout<<dfa_transition[i][j]<<" ";
+        }
+        cout<<endl;
+    }
 
     return 0;
 }

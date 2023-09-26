@@ -75,6 +75,7 @@ int main()
         for(int j=0; j<STATES; j++)
         {
             RE[i][j][0] += Transition[i][j];
+            if(RE[i][i][0] == "#") RE[i][i][0] = "e";
         }
     }
 

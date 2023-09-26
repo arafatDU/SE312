@@ -5,7 +5,7 @@ int main()
 {
     string str;
     char ch;
-    int i=0, j=0, line_num = 1;
+    int i=0, j=0, line_num = 1, multipleEndAt;
     bool isEndMultipleLine = false;
     FILE *fp;
     fp = fopen("test_code.c", "r");
@@ -45,7 +45,10 @@ int main()
         {
             cout<<"Start Multiple line comment at line: "<<line_num<<endl;
             j = i+2;
+            multipleEndAt = line_num;
             while(str[j]){
+                if(str[j] == '\n') multipleEndAt++;
+                if(str[j] == '/' && str[j+1] == '*') break;
                 if(str[j] == '*' && str[j+1] == '/')
                 {
                     isEndMultipleLine = true;
@@ -54,19 +57,19 @@ int main()
                 j++;
             }
             if(!isEndMultipleLine){
-                cout<<"Error!!!  NO END OF MULTIPLELINECOMMENT"<<endl;
+                cout<<"Error!!!  NO END OF MULTIPLELINECOMMENT"<<endl<<endl;
             }
         }
 
         // Printing multiple line if there is found end of MULTIPLELINECOMMENT
         if(isEndMultipleLine)
         {
-            cout<<"End of multiple line comment at line "<< line_num<<endl<<"Comment: ";
+            cout<<"End of multiple line comment at line "<< multipleEndAt<<endl<<"Comment: ";
             for(i+=2; i<= j-2; i++)
             {
                 cout<<str[i];
             }
-            cout<<endl;
+            cout<<endl<<endl;
             isEndMultipleLine = false;
         }
     }
