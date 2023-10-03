@@ -16,11 +16,11 @@ string replace(string s, char c1, string s2)
     {
         // check for c1 and replace
         if (s[i] == c1) break;
-        sub1[i]= s[i];
+        sub1 += s[i];
     }
-    for( int j=0; j<l-i; j++)
+    for( i = i+1; i<l; i++)
     {
-        sub2[j] = s[++i];
+        sub2 += s[i];
     }
     s = sub1 + s2 + sub2;
     return s;
@@ -91,14 +91,13 @@ int main()
     cout<<"Enter the input: ";
     cin>>w;
 
-
+/*       This is a test of Replace function
     string test = "P";
     test = replace(test, 'P', "1P1");
+    test = replace(test, 'P', "0P0");
     cout<<test<<endl;
+*/
 
-    //cout<<w[0]<<"  "<<w[w.length() -1];
-    //derivation = "P ";
-    //cout<<derivation;
     derivation = "P";
     cout<<derivation;
     CTG(w, derivation);
